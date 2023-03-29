@@ -38,6 +38,10 @@ module "s3_module" {
   environment = var.environment
   s3_name   = var.s3_name
   create_block_public_access = var.create_block_public_access
+  create_canned_acl = var.create_canned_acl
+  canned_acl = var.canned_acl
+  lifecycle_rules = var.lifecycle_rules
+  versioning_enabled = var.versioning_enabled
   tags                       = local.tags
   s3_enable_encryption       = var.s3_enable_encryption
   #s3_kms_master_key_id = var.s3_kms_master_key_id
@@ -193,7 +197,7 @@ module "sns_module" {
 
 ###########################################################
 ##############         ETL FLOW-2   ##################
-
+/*
 module "sns_module2" {
   source = "git::https://github.com/my-terraform-aws-modules/terraform-aws-sns.git"
   create_topic = var.create_topic2

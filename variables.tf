@@ -57,6 +57,51 @@ variable "create_block_public_access" {
   type    = bool
   default = true
 }
+variable "create_canned_acl" {
+  description = "Whether to use a canned ACL."
+  type        = bool
+  default = true
+}
+
+variable "canned_acl" {
+  description = "The canned ACL to apply to the bucket."
+  type        = string
+  default     = "private"
+
+  validation {
+    condition = contains([
+      "private",
+      "public-read",
+      "public-read-write",
+      "aws-exec-read",
+      "authenticated-read",
+      "bucket-owner-read",
+      "bucket-owner-full-control",
+      "log-delivery-write",
+    ], var.canned_acl)
+
+    error_message = "Canned ACL not one of the allowed types."
+  }
+}
+variable "lifecycle_rules" {
+  type = list(object({
+    id     = string,
+    status = string,
+
+    noncurrent_version_transition = optional(list(object({
+      noncurrent_days = number
+      storage_class   = string
+    })), [])
+  }))
+
+  default = []
+}
+
+variable "versioning_enabled" {
+  description = "Whether versioning is enabled for bucket objects."
+  type        = bool
+  default     = true
+}
 variable "s3_enable_encryption" {
   description = "Determines whether encryption will be created (affects all resources)"
   type        = bool
@@ -184,7 +229,7 @@ variable "runtime" {
 }
 variable "lambda_handler" {
     description = "give filename & function name which you have mentioned in the file"
-    default = "process_sqs.lambda_handler"
+    default = "lambda_dynamo.lambda_handler"
 }
 variable"create_role"{
     type = bool
@@ -592,6 +637,7 @@ variable "definition_file_name" {
 variable "policy_file_name" {
   type        = string
   description = "The name of the file that contains the iam policy. File should be in JSON format."
+  default = ""
 }
 
 variable "xray_tracing_enabled" {
@@ -603,7 +649,7 @@ variable "xray_tracing_enabled" {
 variable "cloudwatch_log_group_retention_days" {
   type        = number
   description = "Specifies the number of days you want to retain log events in the specified log group. Possible values are: 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1096, 1827, 2192, 2557, 2922, 3288, 3653, and 0. If you select 0, the events in the log group are always retained and never expire."
-  default = null
+  default = 0
   validation {
     condition = contains([
       0, 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1096, 1827, 2192, 2557, 2922, 3288, 3653
