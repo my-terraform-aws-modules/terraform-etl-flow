@@ -37,6 +37,11 @@ variable "deletion_window_in_days" {
   type    = number
   default = 7
 }
+variable "create_kms_policy" {
+  description = "Determines whether resources will be created (affects all resources)"
+  type        = bool
+  default     = true
+}
 ################################################################
 ################################### S3 ##################################
 variable "create_s3" {
@@ -72,7 +77,7 @@ variable "create_bucket_notification_for_existing_resource" {
   type        = bool
   default     = false
 }
-variable "bucket_id" {
+variable "s3_bucket_id" {
   type = string
   default = ""
   
@@ -147,6 +152,11 @@ variable "enable_sqs_lambda_trigger_for_existing_resource" {
   description = "lambda trigger from sqs existing resource"
   type = bool
   default = false
+}
+variable "queue_arn" {
+  type = string
+  default = ""
+    
 }
 variable "lambda_arn" {
   type = string
@@ -345,7 +355,7 @@ variable "create_topic" {
   type        = bool
   default     = true
 }
-variable "sns_name" {
+variable "snsname" {
   description = "The name of the SNS topic to create"
   type        = string
   default     = "demosns"
@@ -382,17 +392,6 @@ variable "topic_policy" {
   default     = null
 }
 
-variable "source_topic_policy_documents" {
-  description = "List of IAM policy documents that are merged together into the exported document. Statements must have unique `sid`s"
-  type        = list(string)
-  default     = []
-}
-
-variable "override_topic_policy_documents" {
-  description = "List of IAM policy documents that are merged together into the exported document. In merging, statements with non-blank `sid`s will override statements with the same `sid`"
-  type        = list(string)
-  default     = []
-}
 
 variable "enable_default_topic_policy" {
   description = "Specifies whether to enable the default topic policy. Defaults to `true`"
@@ -400,11 +399,7 @@ variable "enable_default_topic_policy" {
   default     = true
 }
 
-variable "topic_policy_statements" {
-  description = "A map of IAM policy [statements](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document#statement) for custom permission usage"
-  type        = any
-  default     = {}
-}
+
 
 ################################################################################
 # Subscription(s)
@@ -438,4 +433,183 @@ variable "sqs_endpoint" {
     default = ""
   
 }
+
+################################################################################
+#                    SNS Topic2
+################################################################################
+
+variable "create_topic2" {
+  description = "Determines whether resources will be created (affects all resources)"
+  type        = bool
+  default     = true
+}
+variable "sns-name2" {
+  description = "The name of the SNS topic to create"
+  type        = string
+  default     = "demosns2"
+}
+
+variable "sns_enable_encryption2" {
+  type        = bool
+  description = "Whether or not to use encryption for SNS Topic. If set to `true` and no custom value for KMS key (kms_master_key_id) is provided, it uses the default `alias/aws/sns` KMS key."
+  default     = false
+}
+variable "sns_kms_master_key_id2" {
+  description = "The ID of an AWS-managed customer master key (CMK) for Amazon SNS or a custom CMK"
+  type        = string
+  default = ""
+}
+
+################################################################################
+# Topic Policy
+################################################################################
+
+variable "create_topic_policy2" {
+  description = "Determines whether an SNS topic policy is created"
+  type        = bool
+  default     = true
+}
+variable "topic_policy2" {
+  description = "An externally created fully-formed AWS policy as JSON"
+  type        = string
+  default     = null
+}
+
+
+variable "enable_default_topic_policy2" {
+  description = "Specifies whether to enable the default topic policy. Defaults to `true`"
+  type        = bool
+  default     = true
+}
+
+
+
+################################################################################
+# Subscription(s)
+################################################################################
+variable "enable_email_subscribe2" {
+    type = bool
+    default = false
+  
+}
+variable "enable_lambda_subscribe2" {
+    type = bool
+    default = false
+  
+}
+variable "enable_sqs_subscribe2" {
+    type = bool
+    default = false
+  
+}
+variable "email_endpoint2" {
+    type = string
+    default = ""
+}
+variable "lambda_endpoint2" {
+    type = string
+    default = ""
+}
+variable "sqs_endpoint2" {
+    type = string
+    default = ""
+}
+
+#############################################################
+###############  step function ###########################
+variable "state_machine_tags" {
+  description = "The tags provided by the client module. To be merged with internal tags"
+  type        = map(string)
+  default     = {}
+}
+
+variable "state_machine_name" {
+  type        = string
+  description = "The name of the state machine."
+  default = "demo"
+}
+
+variable "type" {
+  type        = string
+  description = "Determines whether a Standard or Express state machine is created."
+  default = "Standard"
+}
+
+variable "include_execution_data" {
+  type        = bool
+  description = "Determines whether execution data is included in your log. When set to false, data is excluded."
+  default = false
+}
+
+
+variable "logging_configuration_level" {
+  type        = string
+  description = "Defines which category of execution history events are logged. Valid values: ALL, ERROR, FATAL, OFF"
+  default = "ALL"
+  validation {
+    condition = contains([
+      "ALL", "ERROR", "FATAL", "OFF"
+    ], var.logging_configuration_level)
+    error_message = "Must be one of the allowed values."
+  }
+}
+
+variable "cloudwatch_log_group_name" {
+  type        = string
+  description = "The name of the Cloudwatch log group."
+  default = "demologgroup"
+}
+
+variable "cloudwatch_log_group_tags" {
+  description = "The tags provided by the client module. To be merged with internal tags"
+  type        = map(string)
+  default     = {}
+}
+
+variable "iam_role_name" {
+  type        = string
+  description = "The name given to the iam role used by the state machine."
+  default = "demorole"
+}
+
+variable "enable_sfn_encyption" {
+  type = bool
+  default = false  
+}
+
+variable "cloudwatch_log_group_kms_key_arn" {
+  type        = string
+  description = "The ARN of the KMS Key to use when encrypting log data."
+  default = ""
+}
+
+variable "definition_file_name" {
+  type        = string
+  description = "The name of the file that contains the state machine definition. File should be in JSON format."
+  default = "demodefination"
+}
+
+variable "policy_file_name" {
+  type        = string
+  description = "The name of the file that contains the iam policy. File should be in JSON format."
+}
+
+variable "xray_tracing_enabled" {
+  type        = bool
+  description = "When set to true, AWS X-Ray tracing is enabled."
+  default     = true
+}
+
+variable "cloudwatch_log_group_retention_days" {
+  type        = number
+  description = "Specifies the number of days you want to retain log events in the specified log group. Possible values are: 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1096, 1827, 2192, 2557, 2922, 3288, 3653, and 0. If you select 0, the events in the log group are always retained and never expire."
+  default = null
+  validation {
+    condition = contains([
+      0, 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1096, 1827, 2192, 2557, 2922, 3288, 3653
+    ], var.cloudwatch_log_group_retention_days)
+    error_message = "Must be one of the allowed values."
+  }
+}
+
 
