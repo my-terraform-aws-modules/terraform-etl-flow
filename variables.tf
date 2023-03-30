@@ -1,6 +1,6 @@
 variable "region" {
   type    = string
-  default = "eu-west-2"
+  default = "eu-west-1"
 }
 variable "project" {
   default = "test1"
@@ -11,7 +11,7 @@ variable "createdby" {
 variable "environment" {
   description = "The environment to deploy to."
   type        = string
-  default     = "uat"
+  default     = "dev"
   validation {
     condition     = contains(["dev", "prod", "sit", "snd", "uat"], var.environment)
     error_message = "Valid values for var: environment are (dev, prod, sit, snd, uat)."
@@ -229,7 +229,7 @@ variable "runtime" {
 }
 variable "lambda_handler" {
     description = "give filename & function name which you have mentioned in the file"
-    default = "lambda_dynamo.lambda_handler"
+    default = "lambda_dynamodb.lambda_handler"
 }
 variable"create_role"{
     type = bool
@@ -506,7 +506,7 @@ variable "sns_kms_master_key_id2" {
 }
 
 ################################################################################
-# Topic Policy
+# Topic Policy-2
 ################################################################################
 
 variable "create_topic_policy2" {
@@ -530,7 +530,7 @@ variable "enable_default_topic_policy2" {
 
 
 ################################################################################
-# Subscription(s)
+# Subscription(s)-2
 ################################################################################
 variable "enable_email_subscribe2" {
     type = bool
@@ -539,7 +539,7 @@ variable "enable_email_subscribe2" {
 }
 variable "enable_lambda_subscribe2" {
     type = bool
-    default = false
+    default = true
   
 }
 variable "enable_sqs_subscribe2" {
@@ -559,19 +559,66 @@ variable "sqs_endpoint2" {
     type = string
     default = ""
 }
+################################################################
+###################   LAMBDA2   ############################
+
+variable "create-function2" {
+    type = bool
+    default = true 
+}
+variable "lambda_name2" {
+    type = string
+    default = "demo-function2" 
+}
+variable "runtime2" {
+    type = string
+    default = "python3.9"  
+}
+variable "lambda_handler2" {
+    description = "give filename & function name which you have mentioned in the file"
+    default = "lambda_step_function.lambda_handler"
+}
+variable"create_role2"{
+    type = bool
+    default = true
+}
+variable "lambda_role2" {
+    type = string
+    default = "" 
+}
+variable "create-event-invoke2" {
+    type = bool
+    default = false 
+}
+
+variable "sns_arn2" {  
+    type = string
+    default = ""
+}
 
 #############################################################
 ###############  step function ###########################
-variable "state_machine_tags" {
-  description = "The tags provided by the client module. To be merged with internal tags"
-  type        = map(string)
-  default     = {}
+variable "create_sfn" {
+  type = bool
+  default = true
 }
 
 variable "state_machine_name" {
+  type = string
+  default = "demostepfunction"
+}
+variable "use_existing_role" {
+  type = bool
+  default = false
+}
+variable "role_arn" {
+  type = string
+  default = ""
+}
+variable "step_function_defination" {
   type        = string
-  description = "The name of the state machine."
-  default = "demo"
+  description = "The name of the file that contains the state machine definition. File should be in JSON format."
+  default = ""
 }
 
 variable "type" {
@@ -585,8 +632,6 @@ variable "include_execution_data" {
   description = "Determines whether execution data is included in your log. When set to false, data is excluded."
   default = false
 }
-
-
 variable "logging_configuration_level" {
   type        = string
   description = "Defines which category of execution history events are logged. Valid values: ALL, ERROR, FATAL, OFF"
@@ -597,6 +642,16 @@ variable "logging_configuration_level" {
     ], var.logging_configuration_level)
     error_message = "Must be one of the allowed values."
   }
+}
+variable "state_machine_tags" {
+  description = "The tags provided by the client module. To be merged with internal tags"
+  type        = map(string)
+  default     = {}
+}
+variable "xray_tracing_enabled" {
+  type        = bool
+  description = "When set to true, AWS X-Ray tracing is enabled."
+  default     = true
 }
 
 variable "cloudwatch_log_group_name" {
@@ -628,28 +683,10 @@ variable "cloudwatch_log_group_kms_key_arn" {
   default = ""
 }
 
-variable "definition_file_name" {
-  type        = string
-  description = "The name of the file that contains the state machine definition. File should be in JSON format."
-  default = "demodefination"
-}
-
-variable "policy_file_name" {
-  type        = string
-  description = "The name of the file that contains the iam policy. File should be in JSON format."
-  default = ""
-}
-
-variable "xray_tracing_enabled" {
-  type        = bool
-  description = "When set to true, AWS X-Ray tracing is enabled."
-  default     = true
-}
-
 variable "cloudwatch_log_group_retention_days" {
   type        = number
   description = "Specifies the number of days you want to retain log events in the specified log group. Possible values are: 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1096, 1827, 2192, 2557, 2922, 3288, 3653, and 0. If you select 0, the events in the log group are always retained and never expire."
-  default = 0
+  default = 1
   validation {
     condition = contains([
       0, 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1096, 1827, 2192, 2557, 2922, 3288, 3653
@@ -657,5 +694,3 @@ variable "cloudwatch_log_group_retention_days" {
     error_message = "Must be one of the allowed values."
   }
 }
-
-

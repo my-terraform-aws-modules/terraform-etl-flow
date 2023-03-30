@@ -2,13 +2,20 @@
 #to overwrite module variable defalut values .tfvars files can be used
 #command terraform apply -var-file="dev.tfvars" --auto-approve
 #locals..> can use the name multiple times within a module instead of repeating the expression.
-data "archive_file" "lambda_dynamo" {
+data "archive_file" "lambda_dynamodb" {
   type        = "zip"
-  source_file = "${path.module}/python/lambda-dynamo/lambda_dynamo.py"
-  output_path = "${path.module}/python/lambda-dynamo/lambda_dynamo.zip"
+  source_file = "${path.module}/python/lambda/lambda_dynamodb.py"
+  output_path = "${path.module}/python/lambda/lambda_dynamodb.zip"
 }
+  data "archive_file" "lambda_step_function" {
+    type        = "zip"
+    source_file = "${path.module}/python/lambda/lambda_step_function.py"
+    output_path = "${path.module}/python/lambda/lambda-step_function.zip"
+  }
+
 locals {
-  package_filename = data.archive_file.lambda_dynamo.output_path
+  package_filename2 = data.archive_file.lambda_step_function.output_path
+  package_filename = data.archive_file.lambda_dynamodb.output_path
   tags = {
     Project     = var.project
     createdby   = var.createdby
@@ -197,7 +204,8 @@ module "sns_module" {
 
 ###########################################################
 ##############         ETL FLOW-2   ##################
-/*
+###################    SNS   ########################
+
 module "sns_module2" {
   source = "git::https://github.com/my-terraform-aws-modules/terraform-aws-sns.git"
   create_topic = var.create_topic2
@@ -209,26 +217,28 @@ module "sns_module2" {
   topic_policy = var.topic_policy2
   enable_default_topic_policy = var.enable_default_topic_policy2
   tags = local.tags
-  ####################################################
+  ###################################################
+# sns_arn = var.sns_arn
+  sns_arn = module.sns_module2.sns_arn
   enable_lambda_subscribe = var.enable_lambda_subscribe2
-  lambda_endpoint = var.lambda_endpoint2
+  #lambda_endpoint = var.lambda_endpoint2
   enable_email_subscribe = var.enable_email_subscribe2
   email_endpoint = var.email_endpoint2
   enable_sqs_subscribe = var.enable_sqs_subscribe2
   sqs_endpoint = var.sqs_endpoint2
   sns_kms_master_key_id = module.kms_module.key_arn
-  #lambda_endpoint = module.lambda_module2.lambda_arn2
+  lambda_endpoint = module.lambda_module2.lambda_arn
   #sqs_endpoint = module.sqs_module.queue_arn
 }
 
 #################################################################
-/*
+####################   LAMBDA ####################
 module "lambda_module2" {
   source = "git::https://github.com/my-terraform-aws-modules/terraform-aws-lambda.git"
   create-function = var.create-function2
   environment = var.environment
   lambda_name = var.lambda_name2
-  #package_filename = local.package_filename
+  package_filename = local.package_filename2
   runtime = var.runtime
   lambda_handler = var.lambda_handler2
   create_role = var.create_role2
@@ -237,29 +247,33 @@ module "lambda_module2" {
 }
 
 ################################################################
-/*
+############### STEP FUNCTION ##############################
+
 module "step_function_module" {
   source = "git::https://github.com/my-terraform-aws-modules/terraform-aws-step-functions.git"
-  state_machine_tags = var.state_machine_tags
+  create_sfn = var.create_sfn
+  environment = var.environment
   state_machine_name = var.state_machine_name
+  use_existing_role = var.use_existing_role
+  role_arn = var.role_arn
+  step_function_defination = file("step_function.json")
   type = var.type
   include_execution_data = var.include_execution_data
   logging_configuration_level = var.logging_configuration_level
-  cloudwatch_log_group_name = var.logging_configuration_level
+  state_machine_tags = var.state_machine_tags
+  xray_tracing_enabled = var.xray_tracing_enabled
+  cloudwatch_log_group_name = var.cloudwatch_log_group_name
   cloudwatch_log_group_tags = var.cloudwatch_log_group_tags
   iam_role_name = var.iam_role_name
   enable_sfn_encyption = var.enable_sfn_encyption
   cloudwatch_log_group_kms_key_arn = var.cloudwatch_log_group_kms_key_arn
-  definition_file_name = var.definition_file_name
-  policy_file_name = var.policy_file_name
-  xray_tracing_enabled = var.xray_tracing_enabled
   cloudwatch_log_group_retention_days =var.cloudwatch_log_group_retention_days
 
 
 
 
 }
-*/
+
 
 
 
