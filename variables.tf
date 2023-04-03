@@ -606,10 +606,11 @@ variable"iam_for_lambdaa" {
   type = string
   default = "iam_for_lambda2"
 }
+
 variable "enable_lambda_trigger2" {
   description = "Determines whether lambda trgger will be created or not"
   type = bool
-  default = true
+  default = false
 }
 variable "lambda_arn2" {
   description = "the arn of the lambda function"

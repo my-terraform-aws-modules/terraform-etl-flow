@@ -17,7 +17,6 @@ locals {
   custom_lambda_role = aws_iam_role.iam_for_lambda_stfn.arn
   package_filename = data.archive_file.lambda_dynamodb.output_path
   package_filename2 = data.archive_file.lambda_step_function.output_path
-  #lambda_role2 = aws_iam_role.lambda2[0].arn
 
   tags = {
     Project     = var.project
@@ -98,7 +97,6 @@ module "sqs_module" {
   #s3_arn = var.s3_arn
   s3_arn = module.s3_module.s3_arn
   
-
 }
 
 # # ####################################################################
@@ -258,8 +256,8 @@ module "lambda_module2" {
   customized_lambda_role = local.custom_lambda_role
   tags = local.tags
   ##########################################################
-  enable_lambda_trigger = var.enable_lambda_trigger2
-  event_source_arn = module.sns_module2.sns_arn
+  #enable_lambda_trigger = var.enable_lambda_trigger2
+  #event_source_arn = module.sns_module2.sns_arn
   #event_source_arn = var.sns2_arn
   #lambda_arn = var.lambda2_arn
   lambda_arn = module.lambda_module2.lambda_arn
