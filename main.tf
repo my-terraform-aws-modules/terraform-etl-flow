@@ -120,22 +120,18 @@ module "lambda_module" {
   runtime = var.runtime
   lambda_handler = var.lambda_handler
   create_lambda_role = var.create_lambda_role
-  #create_basic_role = var.create_basic_role
   customized_lambda_role = local.custom_lambda_role
   tags = local.tags
-  #dynamo_id = var.dynamo_id
-  
-###########################################################
-  
+########################################################### 
   enable_lambda_trigger = var.enable_lambda_trigger
   event_source_arn = module.sqs_module.queue_arn
-  #event_source_arn= var.event_source_arn_for_lambda
+  #event_source_arn= var.event_source_sqs_arn_for_lambda
   #lambda_arn = var.lambda_arn
   lambda_arn = module.lambda_module.lambda_arn
  
   ###########################################################
   create-event-invoke = var.create-event-invoke
-  #lambda_failure_destination_arn =var.sns_arn
+  #lambda_failure_destination_arn = var.sns_arn
   lambda_failure_destination_arn = module.sns_module.sns_arn
 }
 # # ###########################################################
@@ -255,15 +251,14 @@ module "lambda_module2" {
   runtime = var.runtime2
   lambda_handler = var.lambda_handler2
   create_lambda_role = var.create_lambda_role2
-  #create_basic_role = var.create_basic_role2
   customized_lambda_role = local.custom_lambda_role
   tags = local.tags
   
   ##########################################################
   create_lambda_permission_with_sns = var.create_lambda_permission_with_sns2
   event_source_arn = module.sns_module2.sns_arn
-  #event_source_arn = var.sns2_arn
-  #lambda_arn = var.lambda2_arn
+  #event_source_arn = var.sns_arn2
+  #lambda_arn = var.lambda_arn2
   lambda_arn = module.lambda_module2.lambda_arn
   ###########################################################
   create-event-invoke = var.create-event-invoke2

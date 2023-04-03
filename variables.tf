@@ -245,7 +245,7 @@ variable "lambda_arn" {
   default = ""
     
 }
-variable "event_source_arn_for_lambda" {
+variable "event_source_sqs_arn_for_lambda" {
   description = "arn of sqs service it invokes lambda"
   type = string
   default = ""  
@@ -591,31 +591,15 @@ variable"create_lambda_role2"{
   type = bool
   default = false
 }
-
-
-variable "lambda_role2" {
-  type = string
-  default = "" 
-}
-variable "lambda_policy2" {
-  type = string
-  default = ""
-  
-}
-variable"iam_for_lambdaa" {
-  type = string
-  default = "iam_for_lambda2"
-}
 variable "create_lambda_permission_with_sns2" {
   type = bool
   default = true
 }
-
-variable "enable_lambda_trigger2" {
-  description = "Determines whether lambda trgger will be created or not"
-  type = bool
-  default = true
-}
+# variable "enable_lambda_trigger2" {
+#   description = "(enable only if event source is sqs,dynamodb,kinesis)Determines whether lambda trgger will be created or not"
+#   type = bool
+#   default = false
+# }
 variable "lambda_arn2" {
   description = "the arn of the lambda function"
   type = string
@@ -632,6 +616,11 @@ variable "create-event-invoke2" {
   default = false
 }
 variable "lambda_failure_destination_arn" {
+  type = string
+  default = ""
+  
+}
+variable "lambda_success_destination_arn" {
   type = string
   default = ""
   
