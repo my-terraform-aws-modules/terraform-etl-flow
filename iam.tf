@@ -65,3 +65,4 @@ resource "aws_iam_role_policy" "policy_stfn" {
 
 }
 
+

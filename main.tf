@@ -124,12 +124,15 @@ module "lambda_module" {
   customized_lambda_role = local.custom_lambda_role
   tags = local.tags
   #dynamo_id = var.dynamo_id
+  
 ###########################################################
+  
   enable_lambda_trigger = var.enable_lambda_trigger
   event_source_arn = module.sqs_module.queue_arn
   #event_source_arn= var.event_source_arn_for_lambda
   #lambda_arn = var.lambda_arn
   lambda_arn = module.lambda_module.lambda_arn
+ 
   ###########################################################
   create-event-invoke = var.create-event-invoke
   #lambda_failure_destination_arn =var.sns_arn
@@ -255,15 +258,17 @@ module "lambda_module2" {
   #create_basic_role = var.create_basic_role2
   customized_lambda_role = local.custom_lambda_role
   tags = local.tags
+  
   ##########################################################
-  #enable_lambda_trigger = var.enable_lambda_trigger2
-  #event_source_arn = module.sns_module2.sns_arn
+  create_lambda_permission_with_sns = var.create_lambda_permission_with_sns2
+  event_source_arn = module.sns_module2.sns_arn
   #event_source_arn = var.sns2_arn
   #lambda_arn = var.lambda2_arn
   lambda_arn = module.lambda_module2.lambda_arn
   ###########################################################
   create-event-invoke = var.create-event-invoke2
   #lambda_failure_destination_arn = var.lambda_failure_destination_arn
+  #lambda_success_destination_arn = var.lambda_success_destination_arn
   
 }
 

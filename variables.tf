@@ -606,11 +606,15 @@ variable"iam_for_lambdaa" {
   type = string
   default = "iam_for_lambda2"
 }
+variable "create_lambda_permission_with_sns2" {
+  type = bool
+  default = true
+}
 
 variable "enable_lambda_trigger2" {
   description = "Determines whether lambda trgger will be created or not"
   type = bool
-  default = false
+  default = true
 }
 variable "lambda_arn2" {
   description = "the arn of the lambda function"
@@ -625,7 +629,7 @@ variable "sns_arn2" {
 }
 variable "create-event-invoke2" {
   type = bool
-  default = false 
+  default = false
 }
 variable "lambda_failure_destination_arn" {
   type = string
