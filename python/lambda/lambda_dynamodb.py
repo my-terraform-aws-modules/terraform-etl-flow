@@ -9,7 +9,7 @@ import boto3
 def lambda_handler(event, context):
     dynamodb = boto3.client('dynamodb')
 
-    table_name = 'uat-demoddb'
+    table_name = 'dev-demoddb'
     item = {
         'UserId': {'S': 'demouser'},
         'name': {'S': 'jane'},

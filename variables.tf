@@ -1,11 +1,15 @@
 variable "region" {
-  type    = string
+  description = "the name of the region resources need to be created"
   default = "eu-west-1"
 }
 variable "project" {
+  description = "name of the project"
+  type = string
   default = "test1"
 }
 variable "createdby" {
+  description = "who created this flow"
+  type = string
   default = "GS"
 }
 variable "environment" {
@@ -27,7 +31,7 @@ variable "create_kms" {
 variable "create_alias" {
   description = "Determines whether resources will be created (affects all resources)"
   type        = bool
-  default     = false
+  default     = true
 }
 variable "kms_name" {
   type    = string
@@ -50,10 +54,12 @@ variable "create_s3" {
   default     = true
 }
 variable "s3_name" {
+  description = "The name of the bucket"
   type    = string
   default = "demo98765lkj"
 }
 variable "create_block_public_access" {
+  description = "create block public access"
   type    = bool
   default = true
 }
@@ -105,7 +111,7 @@ variable "versioning_enabled" {
 variable "s3_enable_encryption" {
   description = "Determines whether encryption will be created (affects all resources)"
   type        = bool
-  default     = true
+  default     = false
 }
 variable "s3_kms_master_key_id" {
   description = "The ID of an AWS-managed customer master key (CMK) for s3"
@@ -117,20 +123,22 @@ variable "create_bucket_notification" {
   type        = bool
   default     = true
 }
-variable "create_bucket_notification_for_existing_resource" {
-  description = "Determines whether notification will be created (affects all resources)"
-  type        = bool
-  default     = false
+variable "create_s3_sqs_notification" {
+  description = "Determines whether s3-sqs notification will be created"
+  type = bool
+  default = true
 }
+
 variable "s3_bucket_id" {
+  description = "name of the bucket"
   type = string
   default = ""
   
 }
-variable "sqs_arn" {
+variable "queue_arn" {
   description = "arn of sqs service"
   type        = string
-  default     = ""
+  default =  ""
 }
 ################################################################
 ########################### SQS  ######################################
@@ -147,7 +155,7 @@ variable "sqs_name" {
 variable "sqs_enable_encryption" {
   type        = bool
   description = "Whether or not to use encryption for SNS Topic. If set to `true` and no custom value for KMS key (kms_master_key_id) is provided, it uses the default `alias/aws/sns` KMS key."
-  default     = true
+  default     = false
 }
 variable "sqs_kms_master_key_id" {
   description = "The ID of an AWS-managed customer master key (CMK) for Amazon SQS or a custom CMK"
@@ -188,27 +196,9 @@ variable "dlq_tags" {
   default     = {}
   
 }
-variable "enable_sqs_lambda_trigger" {
-  description = "lambda trigger from sqs"
-  type = bool
-  default = true
-}
-variable "enable_sqs_lambda_trigger_for_existing_resource" {
-  description = "lambda trigger from sqs existing resource"
-  type = bool
-  default = false
-}
-variable "queue_arn" {
-  type = string
-  default = ""
-    
-}
-variable "lambda_arn" {
-  type = string
-  default = ""
-    
-}
+
 variable "s3_arn" {
+  description = "arn of the s3 bucket (event to sqs)"
   type = string
   default = ""
   
@@ -231,22 +221,41 @@ variable "lambda_handler" {
     description = "give filename & function name which you have mentioned in the file"
     default = "lambda_dynamodb.lambda_handler"
 }
-variable"create_role"{
+variable"create_lambda_role"{
     type = bool
-    default = true
+    default = false
+}
+variable "create_lambda_policy" {
+  type = bool
+  default = false
+  
 }
 variable "lambda_role" {
     type = string
     default = "" 
 }
+variable "enable_lambda_trigger" {
+  description = "Determines whether lambda trgger will be created or not"
+  type = bool
+  default = true
+}
+variable "lambda_arn" {
+  description = "the arn of the lambda function"
+  type = string
+  default = ""
+    
+}
+variable "event_source_arn_for_lambda" {
+  description = "arn of sqs service it invokes lambda"
+  type = string
+  default = ""  
+}
 variable "create-event-invoke" {
-    type = bool
-    default = true 
+  description = "after invoking lambda that need to be sent an event to other resource or not"
+  type = bool
+  default = true
 }
-variable "create-event-invoke_for_existing_resource" {
-    type = bool
-    default = false 
-}
+
 variable "sns_arn" {  
     type = string
     default = ""
@@ -366,7 +375,7 @@ variable "server_side_encryption_enabled" {
 variable "dynamo_kms_master_key_id" {
   description = "The ARN of the CMK that should be used for the AWS KMS encryption. This attribute should only be specified if the key is different from the default DynamoDB CMK, alias/aws/dynamodb."
   type        = string
-  default     = null
+  default     = ""
 }
 
 variable "tags" {
@@ -533,27 +542,27 @@ variable "enable_default_topic_policy2" {
 # Subscription(s)-2
 ################################################################################
 variable "enable_email_subscribe2" {
-    type = bool
-    default = false
+  type = bool
+  default = false
   
 }
 variable "enable_lambda_subscribe2" {
-    type = bool
-    default = true
+  type = bool
+  default = true
   
 }
 variable "enable_sqs_subscribe2" {
-    type = bool
-    default = false
+  type = bool
+  default = false
   
 }
 variable "email_endpoint2" {
-    type = string
-    default = ""
+  type = string
+  default = ""
 }
 variable "lambda_endpoint2" {
-    type = string
-    default = ""
+  type = string
+  default = ""
 }
 variable "sqs_endpoint2" {
     type = string
@@ -563,38 +572,66 @@ variable "sqs_endpoint2" {
 ###################   LAMBDA2   ############################
 
 variable "create-function2" {
-    type = bool
-    default = true 
+  type = bool
+  default = true
 }
 variable "lambda_name2" {
-    type = string
-    default = "demo-function2" 
+  type = string
+  default = "demo-function2" 
 }
 variable "runtime2" {
     type = string
     default = "python3.9"  
 }
 variable "lambda_handler2" {
-    description = "give filename & function name which you have mentioned in the file"
-    default = "lambda_step_function.lambda_handler"
+  description = "give filename & function name which you have mentioned in the file"
+  default = "lambda_step_function.lambda_handler"
 }
-variable"create_role2"{
-    type = bool
-    default = true
-}
-variable "lambda_role2" {
-    type = string
-    default = "" 
-}
-variable "create-event-invoke2" {
-    type = bool
-    default = false 
+variable"create_lambda_role2"{
+  type = bool
+  default = false
 }
 
-variable "sns_arn2" {  
-    type = string
-    default = ""
+
+variable "lambda_role2" {
+  type = string
+  default = "" 
 }
+variable "lambda_policy2" {
+  type = string
+  default = ""
+  
+}
+variable"iam_for_lambdaa" {
+  type = string
+  default = "iam_for_lambda2"
+}
+variable "enable_lambda_trigger2" {
+  description = "Determines whether lambda trgger will be created or not"
+  type = bool
+  default = true
+}
+variable "lambda_arn2" {
+  description = "the arn of the lambda function"
+  type = string
+  default = ""
+    
+}
+variable "sns_arn2" {
+  description = "arn of sns service, it invokes lambda"
+  type = string
+  default = ""  
+}
+variable "create-event-invoke2" {
+  type = bool
+  default = false 
+}
+variable "lambda_failure_destination_arn" {
+  type = string
+  default = ""
+  
+}
+
 
 #############################################################
 ###############  step function ###########################
@@ -607,13 +644,18 @@ variable "state_machine_name" {
   type = string
   default = "demostepfunction"
 }
-variable "use_existing_role" {
+variable "create_sfn_role" {
   type = bool
-  default = false
+  default = true
 }
-variable "role_arn" {
+variable "custom_stn_role" {
   type = string
   default = ""
+}
+variable "sfn_iam_role_name" {
+  type        = string
+  description = "The name given to the iam role used by the state machine."
+  default = "sfn-demorole"
 }
 variable "step_function_defination" {
   type        = string
@@ -630,7 +672,7 @@ variable "type" {
 variable "include_execution_data" {
   type        = bool
   description = "Determines whether execution data is included in your log. When set to false, data is excluded."
-  default = false
+  default = true
 }
 variable "logging_configuration_level" {
   type        = string
@@ -653,7 +695,10 @@ variable "xray_tracing_enabled" {
   description = "When set to true, AWS X-Ray tracing is enabled."
   default     = true
 }
-
+variable "create_cloudwatch_log_group" {
+  type = bool
+  default = true
+}
 variable "cloudwatch_log_group_name" {
   type        = string
   description = "The name of the Cloudwatch log group."
@@ -666,15 +711,11 @@ variable "cloudwatch_log_group_tags" {
   default     = {}
 }
 
-variable "iam_role_name" {
-  type        = string
-  description = "The name given to the iam role used by the state machine."
-  default = "demorole"
-}
 
-variable "enable_sfn_encyption" {
+
+variable "enable_sfn_encryption" {
   type = bool
-  default = false  
+  default = false 
 }
 
 variable "cloudwatch_log_group_kms_key_arn" {
@@ -693,4 +734,16 @@ variable "cloudwatch_log_group_retention_days" {
     ], var.cloudwatch_log_group_retention_days)
     error_message = "Must be one of the allowed values."
   }
+}
+variable "create_sfn_logging_policy" {
+  type = bool
+  default = true 
+}
+variable "create_sfn_statemachine_policy" {
+  type = bool
+  default = true
+}
+variable "create_xray_tracing_policy" {
+  type = bool
+  default = true
 }
