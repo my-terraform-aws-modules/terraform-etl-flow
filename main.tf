@@ -1,7 +1,3 @@
-
-#to overwrite module variable defalut values .tfvars files can be used
-#command terraform apply -var-file="dev.tfvars" --auto-approve
-#locals..> can use the name multiple times within a module instead of repeating the expression.
 data "archive_file" "lambda_dynamodb" {
   type        = "zip"
   source_file = "${path.module}/python/lambda/lambda_dynamodb.py"
@@ -26,17 +22,17 @@ locals {
 }
 
 ############################################################
-# module "kms_module" {
-#   source       = "git::https://github.com/my-terraform-aws-modules/terraform-aws-kms.git"
-#   region = var.region
-#   create_kms   = var.create_kms
-#   create_alias = var.create_alias
-#   environment = var.environment
-#   kms_name = var.kms_name 
-#   deletion_window_in_days = var.deletion_window_in_days
-#   tags                    = local.tags
-#   create_kms_policy = var.create_kms_policy
-# }
+module "kms_module" {
+  source       = "git::https://github.com/my-terraform-aws-modules/terraform-aws-kms.git"
+  region = var.region
+  create_kms   = var.create_kms
+  create_alias = var.create_alias
+  environment = var.environment
+  kms_name = var.kms_name 
+  deletion_window_in_days = var.deletion_window_in_days
+  tags                    = local.tags
+  create_kms_policy = var.create_kms_policy
+}
 # #############################################################
 # ###############################################################
 
